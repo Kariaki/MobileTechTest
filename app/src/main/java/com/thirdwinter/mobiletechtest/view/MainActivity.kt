@@ -19,6 +19,8 @@ class MainActivity : ComponentActivity() {
     private val viewModel:NewsArticleViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        viewModel.getNewsArticles(this)
+
         setContent {
             MobileTechTestTheme {
                 // A surface container using the 'background' color from the theme

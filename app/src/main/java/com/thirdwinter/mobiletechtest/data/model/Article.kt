@@ -1,5 +1,7 @@
 package com.thirdwinter.mobiletechtest.data.model
 
+import com.google.gson.Gson
+
 data class Article(
 
     val content: String,
@@ -8,4 +10,7 @@ data class Article(
     val urlToImage: String,
     val author:String
 
-)
+){
+
+
+}

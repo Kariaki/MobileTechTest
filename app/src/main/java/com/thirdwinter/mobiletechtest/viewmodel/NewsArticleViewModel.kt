@@ -1,5 +1,6 @@
 package com.thirdwinter.mobiletechtest.viewmodel
 
+import android.content.Context
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -15,30 +16,34 @@ import javax.inject.Inject
 class NewsArticleViewModel @Inject constructor(private val getArticleUseCase: GetArticleUseCase) :
     ViewModel() {
 
+    val articles = mutableStateOf(HomeScreenStateHolder())
 
-        val articles = mutableStateOf(HomeScreenStateHolder())
-
-    init {
-        getNewsArticles()
-    }
-
-    private fun getNewsArticles(){
+    fun getNewsArticles(context: Context) {
 
         getArticleUseCase().onEach {
-            when(it){
-                is Resource.Loading->{
+            when (it) {
+                is Resource.Loading -> {
                     articles.value = HomeScreenStateHolder(isLoading = true)
                 }
-                is Resource.Success->{
-                    articles.value = HomeScreenStateHolder(data = it.data)
+                is Resource.Success -> {
+                    val result = it.data
+                    articles.value = HomeScreenStateHolder(data = result)
+                    getArticleUseCase.cacheArticle(context, result!!)
+
+
                 }
-                is Resource.Error->{
-                    articles.value = HomeScreenStateHolder(errorMessage = it.message.toString())
+                is Resource.Error -> {
+                    val result = getArticleUseCase.getCachedArticles(context)
+                    if (result.isEmpty()) {
+                        articles.value = HomeScreenStateHolder(errorMessage = it.message.toString())
+                        return@onEach
+                    }
+                    articles.value = HomeScreenStateHolder(data = result)
                 }
             }
         }.launchIn(viewModelScope)
 
-
     }
 
 }
+
